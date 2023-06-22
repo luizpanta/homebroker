@@ -3,7 +3,6 @@ package entity
 import (
 	"sync"
 	"testing"
-
 	"github.com/stretchr/testify/assert"
 )
 
