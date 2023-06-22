@@ -49,7 +49,7 @@ func main() {
 
 	for res := range ordersOut {
 		output := transformer.TransformOutput(res)
-		outputJson, err := json.MarshalIndent(output, "", "  ")
+		outputJson, err := json.MarshalIndent(output, "", "  ") // Marshal tranforma de objeto para json
 		fmt.Println(string(outputJson))
 		if err != nil {
 			fmt.Println(err)
