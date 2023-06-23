@@ -1,14 +1,17 @@
 package entity
 
-import "sync"
+import (
+	"container/heap"
+	"sync"
+)
 
 // EStrutura dados do book
 type Book struct {
-	Order	[]*Order
-	Transaction	[]*Transaction
-	OrderChan	chan *Order	// Canal entrada ordens
-	OrderChanOut chan *Order	// Canal saida ordens
-	Wg	*sync.WaitGroup	//recurso Go await
+	Order         []*Order
+	Transactions  []*Transaction
+	OrdersChan    chan *Order     // Canal entrada ordens
+	OrdersChanOut chan *Order     // Canal saida ordens
+	Wg            *sync.WaitGroup //recurso Go await
 }
 
 // Função do book
@@ -50,13 +53,13 @@ func (b *Book) Trade() {
 			buyOrders[asset].Push(order)
 			if sellOrders[asset].Len() > 0 && sellOrders[asset].Orders[0].Price <= order.Price { // Existe order de venda com preço <= a ordem de compra
 				sellOrder := sellOrders[asset].Pop().(*Order) // Remove da fila
-				if sellOrder.PendingShares > 0 { // Se cair em = 0 ela ja foi liquidada
+				if sellOrder.PendingShares > 0 {              // Se cair em = 0 ela ja foi liquidada
 					transaction := NewTransaction(sellOrder, order, order.Shares, sellOrder.Price) // Nova transação
-					b.AddTransaction(transaction, b.Wg) 
+					b.AddTransaction(transaction, b.Wg)
 					sellOrder.Transactions = append(sellOrder.Transactions, transaction) // Adicionar ordem de venda
-					order.Transactions = append(order.Transactions, transaction) // Adicionar ordem de compra
-					b.OrdersChanOut <- sellOrder  // Canais de saida pro kafka
-					b.OrdersChanOut <- order	  // Outra tread para isso
+					order.Transactions = append(order.Transactions, transaction)         // Adicionar ordem de compra
+					b.OrdersChanOut <- sellOrder                                         // Canais de saida pro kafka
+					b.OrdersChanOut <- order                                             // Outra tread para isso
 					if sellOrder.PendingShares > 0 {
 						sellOrders[asset].Push(sellOrder) // Transação ainda não realizada faltou shares
 					}
@@ -95,10 +98,10 @@ func (b *Book) AddTransaction(transaction *Transaction, wg *sync.WaitGroup) {
 	}
 
 	transaction.SellingOrder.Investor.UpdateAssetPosition(transaction.SellingOrder.Asset.ID, -minShares)
-	transaction.AddSellOrderPendingShares (-minShares) // Subtrai de quem vende shares
+	transaction.AddSellOrderPendingShares(-minShares) // Subtrai de quem vende shares
 
 	transaction.BuyingOrder.Investor.UpdateAssetPosition(transaction.BuyingOrder.Asset.ID, minShares)
-	transaction.AddBuyOrderPendingShares (-minShares) // soma de quem compra shares
+	transaction.AddBuyOrderPendingShares(-minShares) // soma de quem compra shares
 
 	transaction.CalculateTotal(transaction.Shares, transaction.BuyingOrder.Price)
 	transaction.CloseBuyOrder()
