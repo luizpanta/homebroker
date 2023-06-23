@@ -1,4 +1,4 @@
-module github.com/luizpanta/homebroker/
+module github.com/luizpanta/homebroker/go
 
 go 1.20
 
