@@ -1,8 +1,8 @@
 package transformer
 
 import (
-	"github.com/luizpanta/homebroker/go/internal/market/dto"
-	"github.com/luizpanta/homebroker/go/internal/market/entity"
+	"github.com/luizpanta/homebroker/internal/market/dto"
+	"github.com/luizpanta/homebroker/internal/market/entity"
 )
 
 // Transforma do dto a ordem pura em objeto

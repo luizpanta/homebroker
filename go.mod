@@ -1,4 +1,4 @@
-module github.com/devfullcycle/imersao13/go
+module github.com/luizpanta/homebroker/
 
 go 1.20
 
